@@ -410,6 +410,9 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: cuimc.prod.password
           Value: !Ref CuimcProdPassword
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: participant-file.bucket
+          Value: !Ref ParticipantFileBucket
   AWSEBEnvironment:
     Type: 'AWS::ElasticBeanstalk::Environment'
     Properties:

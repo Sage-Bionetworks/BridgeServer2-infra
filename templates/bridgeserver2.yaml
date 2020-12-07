@@ -896,6 +896,8 @@ Resources:
                 - - "arn:aws:s3:::"
                   - !Ref ProcessedHealthDataBucket
                   - "/*"
+  ParticipantFileBucket:
+    Type: 'AWS::S3::Bucket'
   IAMBridgeServer2ECManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:

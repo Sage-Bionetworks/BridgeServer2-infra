@@ -1055,28 +1055,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-  ParticipantFileBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket:
-        Ref: ParticipantFileBucket
-      PolicyDocument:
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              AWS: "arn:aws:iam::325565585839:root"
-            Action:
-              - "s3:ListBucket"
-              - "s3:GetObject"
-              - "s3:PutObject"
-              - "s3:ListObjectsV2"
-              - "s3:DeleteObject"
-              - "s3:CreateMultipartUpload"
-            Resource:
-              - !Join
-                - ""
-                - - "arn:aws:s3:::"
-                  - !Ref ParticipantFileBucket
 Outputs:
   AppPublicEndpoint:
     Value: !Join

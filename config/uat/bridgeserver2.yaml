@@ -26,6 +26,7 @@ parameters:
   HibernateConnectionUsessl: 'true'
   NewRelicAppName: bridgeserver2-uat
   NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
+  ParticipantFileBucket: org-sagebridge-participantfile-uat
   SynapseApiKey: !ssm /bridgeserver2-uat/SynapseApiKey
   SynapseUser: !ssm /bridgeserver2-uat/SynapseUser
   SynapseOAuthClientId: !ssm /bridgeserver2-uat/SynapseOAuthClientId

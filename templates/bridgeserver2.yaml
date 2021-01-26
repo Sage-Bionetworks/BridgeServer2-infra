@@ -106,8 +106,6 @@ Parameters:
   NewRelicLicenseKey:
     Type: String
     NoEcho: true
-  ParticipantFileBucket:
-    Type: String
   RollingUpdateType:
     Type: String
     Default: Time

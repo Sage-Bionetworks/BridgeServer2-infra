@@ -273,25 +273,7 @@ Resources:
           OptionName: aws.key
           Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.key.consents
-          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.key.upload
-          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.key.upload.cms
-          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: aws.secret.key
-          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.secret.key.consents
-          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.secret.key.upload
-          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: aws.secret.key.upload.cms
           Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: ENV

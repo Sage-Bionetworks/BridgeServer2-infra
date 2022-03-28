@@ -27,11 +27,6 @@ Parameters:
   AwsSnsNotificationEndpoint:
     Type: String
     Description: Email address for AWS SNS notifications
-  BootstrapAdminEmail:
-    Type: String
-  BootstrapAdminPassword:
-    Type: String
-    NoEcho: true
   BridgeEnv:
     Type: String
     Default: dev
@@ -49,12 +44,7 @@ Parameters:
   BridgeUser:
     Type: String
     Default: heroku
-  BucketSuffix:
-    Type: String
   CrcGeoCodeApiKey:
-    Type: String
-    NoEcho: true
-  GbfApiKey:
     Type: String
     NoEcho: true
   CuimcTestUsername:
@@ -80,6 +70,14 @@ Parameters:
     Type: String
     Description: Instance type to use for Elastic Beanstalk Instances
     Default: t2.small
+    AllowedValues:
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
   EmailUnsubscribeToken:
     Type: String
     NoEcho: true
@@ -90,13 +88,6 @@ Parameters:
       - production
       - staging
       - develop
-  ExporterRequestSqsQueueUrl:
-    Type: String
-  ExporterSynapseApiKey:
-    Type: String
-    NoEcho: true
-  ExporterSynapseUser:
-    Type: String
   HibernateConnectionPassword:
     Type: String
     NoEcho: true
@@ -110,8 +101,6 @@ Parameters:
       - true
       - false
     ConstraintDescription: must be either true or false
-  HostPostfix:
-    Type: String
   NewRelicAppName:
     Type: String
   NewRelicLicenseKey:
@@ -132,9 +121,7 @@ Parameters:
       - Rolling
       - RollingWithAdditionalBatch
       - Immutable
-  SesNotificationTopicArn:
-    Type: String
-  SynapseApiKey:
+  SynapseAccessToken:
     Type: String
     NoEcho: true
   SynapseUser:
@@ -146,18 +133,8 @@ Parameters:
     Type: String
     NoEcho: true
     Description: The OAuth client registered with Synapse that enables BSM sign in via Synapse
-  UddSqsQueueUrl:
-    Type: String
-  UseHttpsForwarding:
-    Type: String
-    Default: true
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: must be either true or false
 Conditions:
   CreateDevResources: !Equals [ !Ref BridgeEnv, dev ]
-  CreateR53Record: !Equals [ !Ref BridgeEnv, prod ]
 Resources:
   LoadBalancerAccessLogsBucket:
     Type: 'AWS::S3::Bucket'
@@ -184,7 +161,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !ImportValue us-east-1-bridgeserver2-common-BeanstalkAppName
-      SolutionStackName: '64bit Amazon Linux 2 v4.2.11 running Tomcat 8.5 Corretto 8'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v3.4.2 running Tomcat 8.5 Java 8'
       OptionSettings:
         # EB environment options
         - Namespace: 'aws:autoscaling:asg'
@@ -265,25 +242,6 @@ Resources:
           OptionName: HealthCheckPath
           Value: !Ref AppHealthcheckUrl
         - Namespace: 'aws:elasticbeanstalk:healthreporting:system'
-          OptionName: ConfigDocument
-          Value: '{
-            "Rules": {
-              "Environment": {
-                "Application": {
-                  "ApplicationRequests4xx": {
-                    "Enabled": false
-                  }
-                },
-                "ELB": {
-                  "ELBRequests4xx": {
-                    "Enabled": false
-                  }
-                }
-              }
-            },
-            "Version": 1
-          }'
-        - Namespace: 'aws:elasticbeanstalk:healthreporting:system'
           OptionName: SystemType
           Value: !Ref AwsEbHealthReportingSystem
         - Namespace: 'aws:elasticbeanstalk:hostmanager'
@@ -310,23 +268,31 @@ Resources:
         - Namespace: 'aws:elbv2:listener:443'
           OptionName: SSLCertificateArns
           Value: !ImportValue us-east-1-bridgeserver2-common-SSLCertificate
-        # ELB cipher and TLS protocol versions
-        - Namespace: 'aws:elbv2:listener:443'
-          OptionName: SSLPolicy
-          Value: ELBSecurityPolicy-TLS-1-2-2017-01
         # Application environment options
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: aws.key
           Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: aws.key.consents
+          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: aws.key.upload
+          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: aws.key.upload.cms
+          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: aws.secret.key
           Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: admin.email
-          Value: !Ref BootstrapAdminEmail
+          OptionName: aws.secret.key.consents
+          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: admin.password
-          Value: !Ref BootstrapAdminPassword
+          OptionName: aws.secret.key.upload
+          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: aws.secret.key.upload.cms
+          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: ENV
           Value: !Ref Env
@@ -359,20 +325,11 @@ Resources:
           OptionName: email.unsubscribe.token
           Value: !Ref EmailUnsubscribeToken
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.request.sqs.queue.url
-          Value: !Ref ExporterRequestSqsQueueUrl
+          OptionName: health.data.bucket.processed
+          Value: !Ref ProcessedHealthDataBucket
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.synapse.api.key
-          Value: !Ref ExporterSynapseApiKey
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: exporter.synapse.user
-          Value: !Ref ExporterSynapseUser
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: !Join
-            - ''
-            - - !Ref BridgeEnv
-              - '.bucket.suffix'
-          Value: !Ref BucketSuffix
+          OptionName: health.data.bucket.raw
+          Value: !Ref RawHealthDataBucket
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: hibernate.connection.password
           Value: !Ref HibernateConnectionPassword
@@ -390,23 +347,20 @@ Resources:
           OptionName: hibernate.connection.useSSL
           Value: !Ref HibernateConnectionUsessl
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: !Join
-            - ''
-            - - !Ref BridgeEnv
-              - '.host.postfix'
-          Value: !Ref HostPostfix
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: NEW_RELIC_APP_NAME
           Value: !Ref NewRelicAppName
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: NEW_RELIC_LICENSE_KEY
           Value: !Ref NewRelicLicenseKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: ses.notification.topic.arn
-          Value: !Ref SesNotificationTopicArn
+          OptionName: sns.key
+          Value: !Ref AWSIAMBridgeServer2ServiceUserAccessKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.api.key
-          Value: !Ref SynapseApiKey
+          OptionName: sns.secret.key
+          Value: !GetAtt AWSIAMBridgeServer2ServiceUserAccessKey.SecretAccessKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: synapse.access.token
+          Value: !Ref SynapseAccessToken
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.user
           Value: !Ref SynapseUser
@@ -416,12 +370,6 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.oauth.client.secret
           Value: !Ref SynapseOAuthClientSecret
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: udd.sqs.queue.url
-          Value: !Ref UddSqsQueueUrl
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: use.https.forwarding
-          Value: !Ref UseHttpsForwarding
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: crc.geocode.api.key
           Value: !Ref CrcGeoCodeApiKey
@@ -437,9 +385,6 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: cuimc.prod.password
           Value: !Ref CuimcProdPassword
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: gbf.api.key
-          Value: !Ref GbfApiKey
   AWSEBEnvironment:
     Type: 'AWS::ElasticBeanstalk::Environment'
     Properties:
@@ -541,7 +486,6 @@ Resources:
         config:
           ignore_checks:
             - E3012
-    Condition: CreateR53Record
     Properties:
       HostedZoneName: !Join
         - ''
@@ -562,7 +506,6 @@ Resources:
   AWSR53HealthCheck:
     Type: "AWS::Route53::HealthCheck"
     DependsOn: AWSR53RecordSet
-    Condition: CreateR53Record
     Properties:
       HealthCheckConfig:
         FullyQualifiedDomainName: !GetAtt AWSEBEnvironment.EndpointURL
@@ -818,7 +761,6 @@ Resources:
       Threshold: 20
   AWSCWHealthCheckStatusAlarm:
     Type: "AWS::CloudWatch::Alarm"
-    Condition: CreateR53Record
     Properties:
       ActionsEnabled: true
       AlarmActions:
@@ -834,6 +776,101 @@ Resources:
       Period: 300
       Statistic: Average
       Threshold: 1
+  # Bucket for raw health data. Grant Synapse read-only permissions to this bucket. Only Bridge can
+  # write to thise bucket.
+  RawHealthDataBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - Id: SynapseCORSRule
+            AllowedHeaders: ['*']
+            AllowedOrigins: ['*']
+            AllowedMethods: [GET, POST, PUT, HEAD]
+            MaxAge: 3000
+      VersioningConfiguration:
+        Status: Enabled
+  RawHealthDataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: RawHealthDataBucket
+      PolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: "arn:aws:iam::325565585839:root"
+            Action:
+              - "s3:ListBucket*"
+              - "s3:GetBucketLocation"
+            Resource:
+              - !Join
+                - ""
+                - - "arn:aws:s3:::"
+                  - !Ref RawHealthDataBucket
+          - Effect: "Allow"
+            Principal:
+              AWS: "arn:aws:iam::325565585839:root"
+            Action:
+              - "s3:GetObject*"
+              - "s3:*MultipartUpload*"
+            Resource:
+              - !Join
+                - ""
+                - - "arn:aws:s3:::"
+                  - !Ref RawHealthDataBucket
+                  - "/*"
+  # Bucket for processed health data. Grant Synapse read-write permissions to this bucket.
+  ProcessedHealthDataBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - Id: SynapseCORSRule
+            AllowedHeaders: ['*']
+            AllowedOrigins: ['*']
+            AllowedMethods: [GET, POST, PUT, HEAD]
+            MaxAge: 3000
+      VersioningConfiguration:
+        Status: Enabled
+  ProcessedHealthDataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: ProcessedHealthDataBucket
+      PolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              AWS: "arn:aws:iam::325565585839:root"
+            Action:
+              - "s3:ListBucket*"
+              - "s3:GetBucketLocation"
+            Resource:
+              - !Join
+                - ""
+                - - "arn:aws:s3:::"
+                  - !Ref ProcessedHealthDataBucket
+          - Effect: "Allow"
+            Principal:
+              AWS: "arn:aws:iam::325565585839:root"
+            Action:
+              - "s3:*Object*"
+              - "s3:*MultipartUpload*"
+            Resource:
+              - !Join
+                - ""
+                - - "arn:aws:s3:::"
+                  - !Ref ProcessedHealthDataBucket
+                  - "/*"
   IAMBridgeServer2ECManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:

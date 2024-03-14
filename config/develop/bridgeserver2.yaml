@@ -10,8 +10,8 @@ parameters:
   AwsAutoScalingMaxSize: '1'
   AwsAutoScalingMinSize: '1'
   AwsEbHealthReportingSystem: enhanced
-  AwsSnsBounceNotificationEndpoint: bridgepf-develop-bounce-notifications@sagebase.org
-  AwsSnsNotificationEndpoint: bridgepf-develop@sagebase.org
+  AwsSnsBounceNotificationEndpoint: testing@bridgedigital.health
+  AwsSnsNotificationEndpoint: testing@bridgedigital.health
   BootstrapAdminEmail: !ssm /bridgeserver2-develop/BootstrapAdminEmail
   BootstrapAdminPassword: !ssm /bridgeserver2-develop/BootstrapAdminPassword
   BridgeEnv: dev

@@ -482,7 +482,7 @@ Resources:
     Properties:
       Engine: redis
       CacheNodeType: cache.t2.micro
-      NumCacheNodes: 2
+      NumCacheNodes: 1
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
       CacheSubnetGroupName: !Ref ElasticacheSubnetGroup

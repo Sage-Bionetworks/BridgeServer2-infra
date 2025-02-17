@@ -183,7 +183,7 @@ Resources:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
     Properties:
       ApplicationName: !ImportValue us-east-1-bridgeserver2-common-BeanstalkAppName
-      SolutionStackName: '64bit Amazon Linux 2 v4.7.0 running Tomcat 9 Corretto 8'
+      SolutionStackName: '64bit Amazon Linux 2 v4.7.6 running Tomcat 9 Corretto 8'
       OptionSettings:
         # EB environment options
         - Namespace: 'aws:autoscaling:asg'
@@ -259,7 +259,7 @@ Resources:
           Value: '-Dnewrelic.config.file=/etc/newrelic.yml -javaagent:/usr/local/lib/newrelic/newrelic-agent.jar'
         - Namespace: 'aws:elasticbeanstalk:container:tomcat:jvmoptions'
           OptionName: Xmx
-          Value: '1024m'
+          Value: '2048m'
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: ServiceRole
           Value: !ImportValue us-east-1-bridgeserver2-common-BeanstalkServiceRole
@@ -482,7 +482,7 @@ Resources:
     Properties:
       Engine: redis
       CacheNodeType: cache.t2.micro
-      NumCacheNodes: 1
+      NumCacheNodes: 2
       VpcSecurityGroupIds:
         - !GetAtt ElasticacheSecurityGroup.GroupId
       CacheSubnetGroupName: !Ref ElasticacheSubnetGroup

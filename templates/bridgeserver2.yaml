@@ -259,7 +259,7 @@ Resources:
           Value: '-Dnewrelic.config.file=/etc/newrelic.yml -javaagent:/usr/local/lib/newrelic/newrelic-agent.jar'
         - Namespace: 'aws:elasticbeanstalk:container:tomcat:jvmoptions'
           OptionName: Xmx
-          Value: '2048m'
+          Value: '3584m'
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: ServiceRole
           Value: !ImportValue us-east-1-bridgeserver2-common-BeanstalkServiceRole

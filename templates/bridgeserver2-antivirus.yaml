@@ -206,7 +206,12 @@ Resources:
       MemorySize: 1024
   ClamavVirusDefinitionsBucket:
     Type: 'AWS::S3::Bucket'
-    Properties: {}
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
   VirusScanDeadLetterQueue:
     Type: 'AWS::SQS::Queue'
     Properties: {}

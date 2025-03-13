@@ -160,6 +160,13 @@ Conditions:
 Resources:
   LoadBalancerAccessLogsBucket:
     Type: 'AWS::S3::Bucket'
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
   LoadBalancerAccessLogsBucketPolicy:
     Type: "AWS::S3::BucketPolicy"
     Properties:
@@ -543,6 +550,11 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Ref AppDeployBucket
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
   AWSR53RecordSet:
     Type: 'AWS::Route53::RecordSet'
     # This check is bugged. See https://github.com/aws-cloudformation/cfn-python-lint/issues/1425

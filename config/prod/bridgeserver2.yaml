@@ -8,7 +8,7 @@ parameters:
   AppHealthcheckUrl: '/'
   AttachmentBucket: org-sagebridge-attachment-prod
   AwsAutoScalingMaxSize: "4"
-  AwsAutoScalingMinSize: "3"
+  AwsAutoScalingMinSize: "4"
   AwsEbHealthReportingSystem: enhanced
   AwsSnsBounceNotificationEndpoint: bridge-bounce-notifications@sagebase.org
   AwsSnsNotificationEndpoint: bridgeops@sagebase.org

@@ -59,7 +59,7 @@ Resources:
       Role: !GetAtt
         - VirusScanStackInitRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.12
       Timeout: 100
   CloudWatchTimer:
     Type: 'AWS::Events::Rule'
@@ -113,7 +113,7 @@ Resources:
         - VirusScannerRole
         - Arn
       Timeout: 300
-      Runtime: python3.7
+      Runtime: python3.12
       Handler: scan.lambda_handler
       Environment:
         Variables:
@@ -198,7 +198,7 @@ Resources:
         - VirusDefinitionUpdateRole
         - Arn
       Timeout: 300
-      Runtime: python3.7
+      Runtime: python3.12
       Handler: update.lambda_handler
       Environment:
         Variables:

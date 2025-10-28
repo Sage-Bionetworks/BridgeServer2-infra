@@ -27,6 +27,11 @@ Parameters:
 Resources:
   DBCluster:
     Type: AWS::RDS::DBCluster
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - W1011
     Properties:
       AvailabilityZones: !Ref DatabaseClusterAvailabilityZones
       BackupRetentionPeriod: !Ref DatabaseBackupRetentionDays

@@ -1,6 +1,6 @@
 sudo: false
 language: python
-python: 3.12
+python: 3.13
 cache: pip
 fast_finish: true
 branches:
@@ -9,8 +9,8 @@ branches:
   - uat
   - prod
 install:
+  - pip install -U awscli cfn-lint "sceptre>=4.6" sceptre-ssm-resolver
   - ./setup_aws_cli.sh || travis_terminate 1
-  - pip install cfn-lint sceptre sceptre-ssm-resolver
 stages:
   - name: validate
   - name: deploy
